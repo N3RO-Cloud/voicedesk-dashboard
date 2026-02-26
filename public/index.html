@@ -1,690 +1,802 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoiceDesk AI – Support Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>VoiceDesk – Drimalski & Partner</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #080c12;
-  --s1: #0d1520;
-  --s2: #111d2e;
-  --border: #1a2d45;
-  --accent: #00c8ff;
-  --accent2: #0057ff;
-  --green: #00e87a;
-  --red: #ff3b3b;
-  --orange: #ff8c00;
-  --yellow: #ffd600;
-  --text: #dce8f5;
-  --muted: #4a6380;
-  --mono: 'JetBrains Mono', monospace;
-  --display: 'Syne', sans-serif;
-}
+  :root {
+    --bg: #080b10;
+    --surface: #0e1318;
+    --surface2: #141a22;
+    --border: rgba(255,255,255,0.06);
+    --accent: #00e5ff;
+    --accent2: #7b61ff;
+    --red: #ff4d6a;
+    --orange: #ff8c42;
+    --green: #00e096;
+    --yellow: #ffd166;
+    --text: #e8edf2;
+    --muted: #4a5568;
+    --muted2: #2d3748;
+  }
 
-- { box-sizing: border-box; margin: 0; padding: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-background: var(–bg);
-color: var(–text);
-font-family: var(–display);
-min-height: 100vh;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* animated grid */
-body::before {
-content: ‘’;
-position: fixed; inset: 0;
-background-image:
-linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px),
-linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px);
-background-size: 48px 48px;
-pointer-events: none; z-index: 0;
-}
+  /* Ambient background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(123,97,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* glow orb */
-body::after {
-content: ‘’;
-position: fixed;
-top: -200px; left: 50%;
-transform: translateX(-50%);
-width: 800px; height: 400px;
-background: radial-gradient(ellipse, rgba(0,87,255,0.12) 0%, transparent 70%);
-pointer-events: none; z-index: 0;
-}
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8,11,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
 
-/* ── HEADER ─────────────────────────────────────── */
-header {
-position: sticky; top: 0; z-index: 100;
-background: rgba(8,12,18,0.85);
-backdrop-filter: blur(16px);
-border-bottom: 1px solid var(–border);
-padding: 0 32px;
-height: 60px;
-display: flex; align-items: center; gap: 16px;
-}
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-.brand {
-display: flex; align-items: center; gap: 10px;
-}
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
 
-.brand-icon {
-width: 28px; height: 28px;
-border-radius: 8px;
-background: linear-gradient(135deg, var(–accent2), var(–accent));
-display: flex; align-items: center; justify-content: center;
-font-size: 14px;
-}
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+  }
 
-.brand-name {
-font-size: 15px; font-weight: 800;
-letter-spacing: -0.02em;
-color: #fff;
-}
+  .logo-text span {
+    color: var(--accent);
+  }
 
-.brand-name span { color: var(–accent); }
+  .logo-sub {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
 
-.live-badge {
-display: flex; align-items: center; gap: 6px;
-background: rgba(0,232,122,0.1);
-border: 1px solid rgba(0,232,122,0.25);
-border-radius: 20px;
-padding: 3px 10px;
-font-family: var(–mono);
-font-size: 10px;
-color: var(–green);
-letter-spacing: 0.1em;
-}
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 
-.live-dot {
-width: 6px; height: 6px;
-border-radius: 50%;
-background: var(–green);
-box-shadow: 0 0 8px var(–green);
-animation: blink 1.5s infinite;
-}
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,224,150,0.08);
+    border: 1px solid rgba(0,224,150,0.2);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    color: var(--green);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
 
-.header-right {
-margin-left: auto;
-display: flex; align-items: center; gap: 12px;
-}
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
 
-.demo-btn {
-font-family: var(–mono);
-font-size: 11px;
-font-weight: 500;
-letter-spacing: 0.08em;
-padding: 8px 18px;
-border-radius: 6px;
-border: 1px solid var(–accent2);
-background: rgba(0,87,255,0.15);
-color: var(–accent);
-cursor: pointer;
-transition: all 0.2s;
-}
-.demo-btn:hover { background: rgba(0,87,255,0.3); }
+  .refresh-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ── LAYOUT ─────────────────────────────────────── */
-.container {
-max-width: 1280px;
-margin: 0 auto;
-padding: 32px 24px;
-position: relative; z-index: 1;
-}
+  .demo-btn {
+    background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(123,97,255,0.15));
+    border: 1px solid rgba(0,229,255,0.3);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .demo-btn:hover { background: linear-gradient(135deg, rgba(0,229,255,0.25), rgba(123,97,255,0.25)); }
 
-/* ── STATS ROW ──────────────────────────────────── */
-.stats-row {
-display: grid;
-grid-template-columns: repeat(5, 1fr);
-gap: 12px;
-margin-bottom: 28px;
-}
+  /* Main layout */
+  main {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
 
-.stat-card {
-background: var(–s1);
-border: 1px solid var(–border);
-border-radius: 12px;
-padding: 20px;
-position: relative;
-overflow: hidden;
-transition: border-color 0.2s;
-}
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
 
-.stat-card::before {
-content: ‘’;
-position: absolute;
-top: 0; left: 0; right: 0;
-height: 2px;
-background: var(–accent-color, var(–accent));
-opacity: 0.6;
-}
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: rgba(255,255,255,0.12); }
 
-.stat-card:hover { border-color: rgba(0,200,255,0.3); }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--card-accent, var(--accent));
+    opacity: 0.6;
+  }
 
-.stat-label {
-font-family: var(–mono);
-font-size: 10px;
-letter-spacing: 0.15em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 10px;
-}
+  .stat-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.75rem;
+  }
 
-.stat-value {
-font-size: 36px;
-font-weight: 800;
-line-height: 1;
-color: var(–accent-color, #fff);
-}
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text);
+  }
 
-.stat-sub {
-font-family: var(–mono);
-font-size: 10px;
-color: var(–muted);
-margin-top: 6px;
-}
+  .stat-sub {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
 
-/* ── MAIN GRID ──────────────────────────────────── */
-.main-grid {
-display: grid;
-grid-template-columns: 1fr 340px;
-gap: 20px;
-}
+  /* Content area */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+  }
 
-/* ── TICKETS ────────────────────────────────────── */
-.panel {
-background: var(–s1);
-border: 1px solid var(–border);
-border-radius: 14px;
-overflow: hidden;
-}
+  /* Tickets section */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
 
-.panel-header {
-padding: 16px 20px;
-border-bottom: 1px solid var(–border);
-display: flex; align-items: center; gap: 10px;
-}
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
 
-.panel-title {
-font-size: 13px;
-font-weight: 700;
-letter-spacing: 0.05em;
-text-transform: uppercase;
-color: #fff;
-}
+  .ticket-count {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
 
-.count-badge {
-background: rgba(0,200,255,0.1);
-border: 1px solid rgba(0,200,255,0.2);
-border-radius: 10px;
-padding: 2px 8px;
-font-family: var(–mono);
-font-size: 11px;
-color: var(–accent);
-}
+  /* Ticket cards */
+  .ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
 
-.tickets-list {
-padding: 12px;
-display: flex;
-flex-direction: column;
-gap: 8px;
-max-height: 680px;
-overflow-y: auto;
-}
+  .ticket-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
 
-.tickets-list::-webkit-scrollbar { width: 4px; }
-.tickets-list::-webkit-scrollbar-track { background: transparent; }
-.tickets-list::-webkit-scrollbar-thumb { background: var(–border); border-radius: 4px; }
+  .ticket-card:hover {
+    border-color: rgba(255,255,255,0.12);
+    transform: translateY(-1px);
+  }
 
-.ticket-item {
-background: var(–s2);
-border: 1px solid var(–border);
-border-radius: 10px;
-padding: 14px 16px;
-cursor: pointer;
-transition: all 0.15s;
-border-left: 3px solid transparent;
-animation: slideIn 0.3s ease;
-}
+  .ticket-card.selected {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.03);
+  }
 
-@keyframes slideIn {
-from { opacity: 0; transform: translateY(-8px); }
-to { opacity: 1; transform: translateY(0); }
-}
+  .ticket-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
 
-.ticket-item:hover { border-color: rgba(0,200,255,0.25); background: rgba(0,200,255,0.04); }
-.ticket-item.selected { border-color: var(–accent); background: rgba(0,200,255,0.06); }
-.ticket-item.priority-critical { border-left-color: var(–red); }
-.ticket-item.priority-high { border-left-color: var(–orange); }
-.ticket-item.priority-medium { border-left-color: var(–yellow); }
-.ticket-item.priority-low { border-left-color: var(–green); }
+  .ticket-id {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
 
-.ticket-top {
-display: flex; align-items: center; gap: 8px;
-margin-bottom: 8px;
-}
+  .ticket-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    flex: 1;
+    line-height: 1.3;
+  }
 
-.ticket-id-label {
-font-family: var(–mono);
-font-size: 10px;
-color: var(–muted);
-}
+  .ticket-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
 
-.priority-tag {
-font-family: var(–mono);
-font-size: 9px;
-font-weight: 600;
-letter-spacing: 0.1em;
-padding: 2px 7px;
-border-radius: 3px;
-text-transform: uppercase;
-margin-left: auto;
-}
+  .badge {
+    font-size: 0.62rem;
+    padding: 2px 8px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
 
-.tag-critical { background: rgba(255,59,59,0.15); color: var(–red); }
-.tag-high { background: rgba(255,140,0,0.15); color: var(–orange); }
-.tag-medium { background: rgba(255,214,0,0.12); color: var(–yellow); }
-.tag-low { background: rgba(0,232,122,0.12); color: var(–green); }
+  .badge-critical { background: rgba(255,77,106,0.12); border-color: rgba(255,77,106,0.3); color: var(--red); }
+  .badge-high { background: rgba(255,140,66,0.12); border-color: rgba(255,140,66,0.3); color: var(--orange); }
+  .badge-medium { background: rgba(255,209,102,0.12); border-color: rgba(255,209,102,0.3); color: var(--yellow); }
+  .badge-low { background: rgba(0,224,150,0.12); border-color: rgba(0,224,150,0.3); color: var(--green); }
 
-.ticket-title-text {
-font-size: 13px;
-font-weight: 600;
-color: #fff;
-line-height: 1.4;
-margin-bottom: 8px;
-}
+  .badge-category {
+    background: rgba(123,97,255,0.1);
+    border-color: rgba(123,97,255,0.2);
+    color: #a78bfa;
+  }
 
-.ticket-meta {
-display: flex; gap: 12px;
-font-family: var(–mono);
-font-size: 10px;
-color: var(–muted);
-}
+  .badge-open { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.2); color: var(--accent); }
+  .badge-progress { background: rgba(255,209,102,0.08); border-color: rgba(255,209,102,0.2); color: var(--yellow); }
+  .badge-resolved { background: rgba(0,224,150,0.08); border-color: rgba(0,224,150,0.2); color: var(--green); }
 
-.cat-badge {
-background: rgba(0,87,255,0.12);
-color: rgba(0,200,255,0.7);
-border: 1px solid rgba(0,87,255,0.2);
-border-radius: 3px;
-padding: 1px 6px;
-font-size: 9px;
-font-family: var(–mono);
-}
+  .ticket-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
 
-/* ── DETAIL PANEL ───────────────────────────────── */
-.detail-panel {
-display: flex;
-flex-direction: column;
-gap: 12px;
-}
+  .ticket-caller {
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 
-.detail-card {
-background: var(–s1);
-border: 1px solid var(–border);
-border-radius: 14px;
-overflow: hidden;
-}
+  .ticket-time {
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
 
-.detail-body {
-padding: 16px;
-}
+  /* Priority left border */
+  .ticket-card[data-priority="critical"] { border-left: 3px solid var(--red); }
+  .ticket-card[data-priority="high"] { border-left: 3px solid var(--orange); }
+  .ticket-card[data-priority="medium"] { border-left: 3px solid var(--yellow); }
+  .ticket-card[data-priority="low"] { border-left: 3px solid var(--green); }
 
-.detail-placeholder {
-text-align: center;
-padding: 40px 20px;
-color: var(–muted);
-font-family: var(–mono);
-font-size: 12px;
-line-height: 2;
-}
+  /* Detail panel */
+  .detail-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 80px;
+  }
 
-.field-label {
-font-family: var(–mono);
-font-size: 9px;
-letter-spacing: 0.15em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 6px;
-margin-top: 14px;
-}
-.field-label:first-child { margin-top: 0; }
+  .detail-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+    text-align: center;
+    gap: 1rem;
+  }
 
-.field-value {
-font-size: 13px;
-line-height: 1.6;
-color: var(–text);
-}
+  .detail-empty-icon {
+    font-size: 2.5rem;
+    opacity: 0.3;
+  }
 
-.transcript-box {
-background: rgba(0,0,0,0.3);
-border: 1px solid var(–border);
-border-radius: 8px;
-padding: 12px;
-font-family: var(–mono);
-font-size: 11px;
-line-height: 1.8;
-color: rgba(220,232,245,0.7);
-max-height: 200px;
-overflow-y: auto;
-white-space: pre-wrap;
-}
+  .detail-empty p {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
 
-.status-select {
-width: 100%;
-background: rgba(0,0,0,0.3);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 8px 12px;
-color: var(–text);
-font-family: var(–mono);
-font-size: 12px;
-outline: none;
-cursor: pointer;
-margin-top: 14px;
-}
-.status-select:focus { border-color: var(–accent); }
+  .detail-content { display: none; }
+  .detail-content.active { display: block; }
 
-/* ── EMPTY STATE ────────────────────────────────── */
-.empty-state {
-text-align: center;
-padding: 60px 20px;
-color: var(–muted);
-}
+  .detail-id {
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
 
-.empty-icon {
-font-size: 40px;
-margin-bottom: 12px;
-opacity: 0.4;
-}
+  .detail-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
 
-.empty-title {
-font-size: 15px;
-font-weight: 700;
-color: rgba(220,232,245,0.4);
-margin-bottom: 6px;
-}
+  .detail-section {
+    margin-bottom: 1.25rem;
+  }
 
-.empty-sub {
-font-family: var(–mono);
-font-size: 11px;
-line-height: 1.8;
-}
+  .detail-section-title {
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+  }
 
-/* ── RECENT CALLS ───────────────────────────────── */
-.call-item {
-padding: 10px 16px;
-border-bottom: 1px solid rgba(26,45,69,0.5);
-display: flex; align-items: center; gap: 10px;
-font-family: var(–mono);
-font-size: 11px;
-}
+  .detail-text {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: rgba(232,237,242,0.7);
+  }
 
-.call-dot {
-width: 6px; height: 6px;
-border-radius: 50%;
-background: var(–green);
-flex-shrink: 0;
-}
+  .transcript-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: rgba(232,237,242,0.6);
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
 
-.call-number { color: var(–text); flex: 1; }
-.call-dur { color: var(–muted); }
+  .transcript-box::-webkit-scrollbar { width: 4px; }
+  .transcript-box::-webkit-scrollbar-track { background: transparent; }
+  .transcript-box::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
 
-/* responsive */
-@media (max-width: 900px) {
-.stats-row { grid-template-columns: repeat(3, 1fr); }
-.main-grid { grid-template-columns: 1fr; }
-}
+  .status-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .status-select:focus { border-color: var(--accent); }
+  .status-select option { background: var(--surface2); }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+    text-align: center;
+    gap: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  .empty-icon { font-size: 3rem; opacity: 0.2; }
+  .empty-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--muted); }
+  .empty-sub { font-size: 0.75rem; line-height: 1.6; max-width: 300px; }
+
+  /* Sidebar widgets */
+  .sidebar-widget {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .call-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .call-item:last-child { border-bottom: none; }
+
+  .call-number {
+    font-size: 0.75rem;
+    color: var(--text);
+  }
+
+  .call-duration {
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ticket-card {
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  /* Phone display */
+  .phone-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .phone-chip span { color: var(--muted); font-size: 0.65rem; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
 </style>
-
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <div class="brand-icon">🎙</div>
-    <span class="brand-name">Voice<span>Desk</span> AI</span>
-  </div>
-  <div class="live-badge">
-    <div class="live-dot"></div>
-    LIVE
+  <div class="logo">
+    <div class="logo-icon">📞</div>
+    <div>
+      <div class="logo-text">Voice<span>Desk</span></div>
+      <div class="logo-sub">Drimalski & Partner IT-Support</div>
+    </div>
   </div>
   <div class="header-right">
-    <button class="demo-btn" onclick="injectDemo()">⚡ Demo-Anruf simulieren</button>
+    <div class="phone-chip">📱 <span>Hotline</span> +1 207 304 9724</div>
+    <div class="live-badge"><div class="live-dot"></div> Live</div>
+    <button class="demo-btn" onclick="createDemo()">+ Demo Ticket</button>
+    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
   </div>
 </header>
 
-<div class="container">
-
+<main>
   <!-- Stats -->
-
-  <div class="stats-row">
-    <div class="stat-card" style="--accent-color: var(--accent)">
+  <div class="stats-grid">
+    <div class="stat-card" style="--card-accent: var(--accent)">
       <div class="stat-label">Tickets gesamt</div>
-      <div class="stat-value" id="statTotal">0</div>
-      <div class="stat-sub">seit heute</div>
+      <div class="stat-value" id="stat-total">0</div>
+      <div class="stat-sub">Alle Anfragen</div>
     </div>
-    <div class="stat-card" style="--accent-color: #fff">
+    <div class="stat-card" style="--card-accent: var(--accent2)">
       <div class="stat-label">Offen</div>
-      <div class="stat-value" id="statOpen">0</div>
-      <div class="stat-sub">unbearbeitet</div>
+      <div class="stat-value" id="stat-open">0</div>
+      <div class="stat-sub">Wartend</div>
     </div>
-    <div class="stat-card" style="--accent-color: var(--red)">
+    <div class="stat-card" style="--card-accent: var(--red)">
       <div class="stat-label">Kritisch</div>
-      <div class="stat-value" id="statCritical">0</div>
-      <div class="stat-sub">sofort handeln</div>
+      <div class="stat-value" id="stat-critical" style="color: var(--red)">0</div>
+      <div class="stat-sub">Sofortiger Handlungsbedarf</div>
     </div>
-    <div class="stat-card" style="--accent-color: var(--orange)">
+    <div class="stat-card" style="--card-accent: var(--orange)">
       <div class="stat-label">Hoch</div>
-      <div class="stat-value" id="statHigh">0</div>
-      <div class="stat-sub">priorität</div>
+      <div class="stat-value" id="stat-high" style="color: var(--orange)">0</div>
+      <div class="stat-sub">Erhöhte Priorität</div>
     </div>
-    <div class="stat-card" style="--accent-color: var(--green)">
+    <div class="stat-card" style="--card-accent: var(--green)">
       <div class="stat-label">Anrufe</div>
-      <div class="stat-value" id="statCalls">0</div>
-      <div class="stat-sub">verarbeitet</div>
+      <div class="stat-value" id="stat-calls">0</div>
+      <div class="stat-sub">Verarbeitet</div>
     </div>
   </div>
 
-  <!-- Main Grid -->
+  <!-- Content -->
+  <div class="content-grid">
+    <!-- Tickets -->
+    <div>
+      <div class="section-header">
+        <div class="section-title">Support Tickets</div>
+        <div class="ticket-count" id="ticket-count">0 Tickets</div>
+      </div>
+      <div class="ticket-list" id="ticket-list">
+        <div class="empty-state">
+          <div class="empty-icon">🎧</div>
+          <div class="empty-title">Keine Tickets vorhanden</div>
+          <p class="empty-sub">Ruf <strong>+1 207 304 9724</strong> an – nach dem Gespräch erscheint hier automatisch ein Ticket. Oder klick auf "+ Demo Ticket" zum Testen.</p>
+        </div>
+      </div>
+    </div>
 
-  <div class="main-grid">
+    <!-- Sidebar -->
+    <div>
+      <!-- Detail Panel -->
+      <div class="detail-panel" id="detail-panel">
+        <div class="detail-empty" id="detail-empty">
+          <div class="detail-empty-icon">👆</div>
+          <p>Ticket auswählen für Details</p>
+        </div>
+        <div class="detail-content" id="detail-content">
+          <div class="detail-id" id="d-id"></div>
+          <div class="detail-title" id="d-title"></div>
+          <div style="display:flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;" id="d-badges"></div>
 
-```
-<!-- Ticket List -->
-<div class="panel">
-  <div class="panel-header">
-    <span class="panel-title">Support Tickets</span>
-    <span class="count-badge" id="ticketCount">0</span>
-  </div>
-  <div class="tickets-list" id="ticketsList">
-    <div class="empty-state">
-      <div class="empty-icon">📞</div>
-      <div class="empty-title">Warte auf Anrufe…</div>
-      <div class="empty-sub">
-        Wenn jemand anruft, erscheint<br>
-        das Ticket automatisch hier.<br><br>
-        Oder klick "Demo-Anruf simulieren"
+          <div class="detail-section">
+            <div class="detail-section-title">Beschreibung</div>
+            <div class="detail-text" id="d-desc"></div>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-section-title">Anrufer & Dauer</div>
+            <div class="detail-text" id="d-caller"></div>
+          </div>
+
+          <div class="detail-section" id="d-transcript-section">
+            <div class="detail-section-title">Transkript</div>
+            <div class="transcript-box" id="d-transcript"></div>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-section-title">Status ändern</div>
+            <select class="status-select" id="d-status" onchange="updateStatus()">
+              <option value="open">Offen</option>
+              <option value="in-progress">In Bearbeitung</option>
+              <option value="resolved">Gelöst</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Right Column -->
-<div class="detail-panel">
-
-  <!-- Ticket Detail -->
-  <div class="detail-card" id="detailCard">
-    <div class="panel-header">
-      <span class="panel-title">Ticket Detail</span>
-    </div>
-    <div class="detail-body">
-      <div class="detail-placeholder">
-        ← Ticket auswählen<br>um Details zu sehen
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent Calls -->
-  <div class="panel">
-    <div class="panel-header">
-      <span class="panel-title">Letzte Anrufe</span>
-    </div>
-    <div id="callsList">
-      <div style="padding:20px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted)">
-        Noch keine Anrufe
-      </div>
-    </div>
-  </div>
-
-</div>
-```
-
-  </div>
-</div>
+</main>
 
 <script>
-let allTickets = [];
-let selectedId = null;
+  let tickets = [];
+  let selectedId = null;
 
-function formatTime(iso) {
-  const d = new Date(iso);
-  return d.toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-}
-
-function formatDuration(sec) {
-  const m = Math.floor(sec / 60), s = sec % 60;
-  return m + ':' + String(s).padStart(2, '0') + ' min';
-}
-
-function renderTickets() {
-  const list = document.getElementById('ticketsList');
-  document.getElementById('ticketCount').textContent = allTickets.length;
-
-  if (!allTickets.length) {
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">📞</div>
-      <div class="empty-title">Warte auf Anrufe…</div>
-      <div class="empty-sub">Wenn jemand anruft, erscheint<br>das Ticket automatisch hier.<br><br>Oder klick "Demo-Anruf simulieren"</div>
-    </div>`;
-    return;
+  function getPriorityLabel(p) {
+    const map = { critical: 'Kritisch', high: 'Hoch', medium: 'Mittel', low: 'Niedrig' };
+    return map[p] || p;
   }
 
-  list.innerHTML = allTickets.map(t => `
-    <div class="ticket-item priority-${t.priority} ${selectedId === t.id ? 'selected' : ''}"
-         onclick="selectTicket('${t.id}')">
-      <div class="ticket-top">
-        <span class="ticket-id-label">${t.id}</span>
-        <span class="cat-badge">${t.category}</span>
-        <span class="priority-tag tag-${t.priority}">${t.priority}</span>
-      </div>
-      <div class="ticket-title-text">${t.title}</div>
-      <div class="ticket-meta">
-        <span>📞 ${t.caller}</span>
-        <span>⏱ ${formatDuration(t.duration)}</span>
-        <span>${formatTime(t.createdAt)}</span>
-      </div>
-    </div>
-  `).join('');
-}
+  function getStatusLabel(s) {
+    const map = { open: 'Offen', 'in-progress': 'In Bearbeitung', resolved: 'Gelöst' };
+    return map[s] || s;
+  }
 
-function selectTicket(id) {
-  selectedId = id;
-  const t = allTickets.find(x => x.id === id);
-  if (!t) return;
-  renderTickets();
+  function formatDuration(s) {
+    if (!s) return '—';
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+  }
 
-  const card = document.getElementById('detailCard');
-  card.querySelector('.detail-body').innerHTML = `
-    <div class="field-label">Ticket ID</div>
-    <div class="field-value" style="font-family:var(--mono);color:var(--accent)">${t.id}</div>
+  function formatTime(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
 
-    <div class="field-label">Titel</div>
-    <div class="field-value" style="font-weight:700;color:#fff;font-size:14px">${t.title}</div>
+  function renderTickets() {
+    const list = document.getElementById('ticket-list');
+    const count = document.getElementById('ticket-count');
+    count.textContent = tickets.length + ' Tickets';
 
-    <div class="field-label">Beschreibung</div>
-    <div class="field-value">${t.description}</div>
-
-    <div class="field-label">Anrufer</div>
-    <div class="field-value" style="font-family:var(--mono)">${t.caller}</div>
-
-    <div class="field-label">Gesprächsdauer</div>
-    <div class="field-value" style="font-family:var(--mono)">${formatDuration(t.duration)}</div>
-
-    <div class="field-label">Transkript</div>
-    <div class="transcript-box">${t.transcript || 'Kein Transkript verfügbar.'}</div>
-
-    <div class="field-label">Status ändern</div>
-    <select class="status-select" onchange="updateStatus('${t.id}', this.value)">
-      <option value="open" ${t.status==='open'?'selected':''}>🔴 Offen</option>
-      <option value="in-progress" ${t.status==='in-progress'?'selected':''}>🟡 In Bearbeitung</option>
-      <option value="resolved" ${t.status==='resolved'?'selected':''}>🟢 Gelöst</option>
-    </select>
-  `;
-}
-
-async function updateStatus(id, status) {
-  await fetch('/api/tickets/' + id, {
-    method: 'PATCH',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ status })
-  });
-  const t = allTickets.find(x => x.id === id);
-  if (t) t.status = status;
-  updateStats();
-}
-
-function updateStats() {
-  const open = allTickets.filter(t => t.status === 'open').length;
-  const critical = allTickets.filter(t => t.priority === 'critical').length;
-  const high = allTickets.filter(t => t.priority === 'high').length;
-  document.getElementById('statTotal').textContent = allTickets.length;
-  document.getElementById('statOpen').textContent = open;
-  document.getElementById('statCritical').textContent = critical;
-  document.getElementById('statHigh').textContent = high;
-}
-
-async function fetchStats() {
-  try {
-    const r = await fetch('/api/stats');
-    const s = await r.json();
-    document.getElementById('statCalls').textContent = s.calls;
-  } catch(e) {}
-}
-
-async function loadTickets() {
-  try {
-    const r = await fetch('/api/tickets');
-    const fresh = await r.json();
-    if (fresh.length !== allTickets.length) {
-      allTickets = fresh;
-      renderTickets();
-      updateStats();
-      fetchStats();
+    if (tickets.length === 0) {
+      list.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">🎧</div>
+        <div class="empty-title">Keine Tickets vorhanden</div>
+        <p class="empty-sub">Ruf <strong>+1 207 304 9724</strong> an – nach dem Gespräch erscheint hier automatisch ein Ticket. Oder klick auf "+ Demo Ticket" zum Testen.</p>
+      </div>`;
+      return;
     }
-  } catch(e) {}
-}
 
-async function injectDemo() {
-  const btn = document.querySelector('.demo-btn');
-  btn.textContent = '⏳ Simuliere Anruf…';
-  btn.disabled = true;
-  try {
-    await fetch('/api/demo-ticket', { method: 'POST' });
-    await loadTickets();
-  } finally {
-    btn.textContent = '⚡ Demo-Anruf simulieren';
-    btn.disabled = false;
+    list.innerHTML = tickets.map(t => `
+      <div class="ticket-card ${selectedId === t.id ? 'selected' : ''}" 
+           data-priority="${t.priority}" 
+           onclick="selectTicket('${t.id}')">
+        <div class="ticket-top">
+          <div class="ticket-title">${t.title}</div>
+          <div class="ticket-id">${t.id}</div>
+        </div>
+        <div class="ticket-meta">
+          <span class="badge badge-${t.priority}">${getPriorityLabel(t.priority)}</span>
+          <span class="badge badge-category">${t.category}</span>
+          <span class="badge badge-${t.status === 'open' ? 'open' : t.status === 'in-progress' ? 'progress' : 'resolved'}">${getStatusLabel(t.status)}</span>
+        </div>
+        <div class="ticket-footer">
+          <div class="ticket-caller">📞 ${t.caller} · ${formatDuration(t.duration)}</div>
+          <div class="ticket-time">${formatTime(t.createdAt)}</div>
+        </div>
+      </div>
+    `).join('');
   }
-}
 
-// Poll every 3 seconds for new tickets
-loadTickets();
-setInterval(loadTickets, 3000);
+  function selectTicket(id) {
+    selectedId = id;
+    const t = tickets.find(x => x.id === id);
+    if (!t) return;
+
+    document.getElementById('detail-empty').style.display = 'none';
+    document.getElementById('detail-content').classList.add('active');
+
+    document.getElementById('d-id').textContent = t.id;
+    document.getElementById('d-title').textContent = t.title;
+    document.getElementById('d-badges').innerHTML = `
+      <span class="badge badge-${t.priority}">${getPriorityLabel(t.priority)}</span>
+      <span class="badge badge-category">${t.category}</span>
+    `;
+    document.getElementById('d-desc').textContent = t.description || '—';
+    document.getElementById('d-caller').textContent = `${t.caller} · ${formatDuration(t.duration)} · ${formatTime(t.createdAt)}`;
+
+    const transcriptSection = document.getElementById('d-transcript-section');
+    const transcriptBox = document.getElementById('d-transcript');
+    if (t.transcript) {
+      transcriptSection.style.display = 'block';
+      transcriptBox.textContent = t.transcript;
+    } else {
+      transcriptSection.style.display = 'none';
+    }
+
+    document.getElementById('d-status').value = t.status || 'open';
+    renderTickets();
+  }
+
+  async function updateStatus() {
+    if (!selectedId) return;
+    const status = document.getElementById('d-status').value;
+    try {
+      await fetch(`/api/tickets/${selectedId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const t = tickets.find(x => x.id === selectedId);
+      if (t) t.status = status;
+      renderTickets();
+    } catch(e) {}
+  }
+
+  async function loadData() {
+    try {
+      const [ticketRes, statsRes] = await Promise.all([
+        fetch('/api/tickets'),
+        fetch('/api/stats')
+      ]);
+      tickets = await ticketRes.json();
+      const stats = await statsRes.json();
+
+      document.getElementById('stat-total').textContent = stats.total;
+      document.getElementById('stat-open').textContent = stats.open;
+      document.getElementById('stat-critical').textContent = stats.critical;
+      document.getElementById('stat-high').textContent = stats.high;
+      document.getElementById('stat-calls').textContent = stats.calls;
+
+      renderTickets();
+      if (selectedId) selectTicket(selectedId);
+    } catch(e) {
+      console.error('Load error:', e);
+    }
+  }
+
+  async function createDemo() {
+    try {
+      await fetch('/api/demo-ticket', { method: 'POST' });
+      await loadData();
+    } catch(e) {}
+  }
+
+  loadData();
+  setInterval(loadData, 15000);
 </script>
-
 </body>
 </html>
