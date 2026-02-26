@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoiceDesk AI – Support Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c12;
+  --s1: #0d1520;
+  --s2: #111d2e;
+  --border: #1a2d45;
+  --accent: #00c8ff;
+  --accent2: #0057ff;
+  --green: #00e87a;
+  --red: #ff3b3b;
+  --orange: #ff8c00;
+  --yellow: #ffd600;
+  --text: #dce8f5;
+  --muted: #4a6380;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Syne', sans-serif;
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: var(–display);
+min-height: 100vh;
+}
+
+/* animated grid */
+body::before {
+content: ‘’;
+position: fixed; inset: 0;
+background-image:
+linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px);
+background-size: 48px 48px;
+pointer-events: none; z-index: 0;
+}
+
+/* glow orb */
+body::after {
+content: ‘’;
+position: fixed;
+top: -200px; left: 50%;
+transform: translateX(-50%);
+width: 800px; height: 400px;
+background: radial-gradient(ellipse, rgba(0,87,255,0.12) 0%, transparent 70%);
+pointer-events: none; z-index: 0;
+}
+
+/* ── HEADER ─────────────────────────────────────── */
+header {
+position: sticky; top: 0; z-index: 100;
+background: rgba(8,12,18,0.85);
+backdrop-filter: blur(16px);
+border-bottom: 1px solid var(–border);
+padding: 0 32px;
+height: 60px;
+display: flex; align-items: center; gap: 16px;
+}
+
+.brand {
+display: flex; align-items: center; gap: 10px;
+}
+
+.brand-icon {
+width: 28px; height: 28px;
+border-radius: 8px;
+background: linear-gradient(135deg, var(–accent2), var(–accent));
+display: flex; align-items: center; justify-content: center;
+font-size: 14px;
+}
+
+.brand-name {
+font-size: 15px; font-weight: 800;
+letter-spacing: -0.02em;
+color: #fff;
+}
+
+.brand-name span { color: var(–accent); }
+
+.live-badge {
+display: flex; align-items: center; gap: 6px;
+background: rgba(0,232,122,0.1);
+border: 1px solid rgba(0,232,122,0.25);
+border-radius: 20px;
+padding: 3px 10px;
+font-family: var(–mono);
+font-size: 10px;
+color: var(–green);
+letter-spacing: 0.1em;
+}
+
+.live-dot {
+width: 6px; height: 6px;
+border-radius: 50%;
+background: var(–green);
+box-shadow: 0 0 8px var(–green);
+animation: blink 1.5s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.header-right {
+margin-left: auto;
+display: flex; align-items: center; gap: 12px;
+}
+
+.demo-btn {
+font-family: var(–mono);
+font-size: 11px;
+font-weight: 500;
+letter-spacing: 0.08em;
+padding: 8px 18px;
+border-radius: 6px;
+border: 1px solid var(–accent2);
+background: rgba(0,87,255,0.15);
+color: var(–accent);
+cursor: pointer;
+transition: all 0.2s;
+}
+.demo-btn:hover { background: rgba(0,87,255,0.3); }
+
+/* ── LAYOUT ─────────────────────────────────────── */
+.container {
+max-width: 1280px;
+margin: 0 auto;
+padding: 32px 24px;
+position: relative; z-index: 1;
+}
+
+/* ── STATS ROW ──────────────────────────────────── */
+.stats-row {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+gap: 12px;
+margin-bottom: 28px;
+}
+
+.stat-card {
+background: var(–s1);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 20px;
+position: relative;
+overflow: hidden;
+transition: border-color 0.2s;
+}
+
+.stat-card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 2px;
+background: var(–accent-color, var(–accent));
+opacity: 0.6;
+}
+
+.stat-card:hover { border-color: rgba(0,200,255,0.3); }
+
+.stat-label {
+font-family: var(–mono);
+font-size: 10px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 10px;
+}
+
+.stat-value {
+font-size: 36px;
+font-weight: 800;
+line-height: 1;
+color: var(–accent-color, #fff);
+}
+
+.stat-sub {
+font-family: var(–mono);
+font-size: 10px;
+color: var(–muted);
+margin-top: 6px;
+}
+
+/* ── MAIN GRID ──────────────────────────────────── */
+.main-grid {
+display: grid;
+grid-template-columns: 1fr 340px;
+gap: 20px;
+}
+
+/* ── TICKETS ────────────────────────────────────── */
+.panel {
+background: var(–s1);
+border: 1px solid var(–border);
+border-radius: 14px;
+overflow: hidden;
+}
+
+.panel-header {
+padding: 16px 20px;
+border-bottom: 1px solid var(–border);
+display: flex; align-items: center; gap: 10px;
+}
+
+.panel-title {
+font-size: 13px;
+font-weight: 700;
+letter-spacing: 0.05em;
+text-transform: uppercase;
+color: #fff;
+}
+
+.count-badge {
+background: rgba(0,200,255,0.1);
+border: 1px solid rgba(0,200,255,0.2);
+border-radius: 10px;
+padding: 2px 8px;
+font-family: var(–mono);
+font-size: 11px;
+color: var(–accent);
+}
+
+.tickets-list {
+padding: 12px;
+display: flex;
+flex-direction: column;
+gap: 8px;
+max-height: 680px;
+overflow-y: auto;
+}
+
+.tickets-list::-webkit-scrollbar { width: 4px; }
+.tickets-list::-webkit-scrollbar-track { background: transparent; }
+.tickets-list::-webkit-scrollbar-thumb { background: var(–border); border-radius: 4px; }
+
+.ticket-item {
+background: var(–s2);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 14px 16px;
+cursor: pointer;
+transition: all 0.15s;
+border-left: 3px solid transparent;
+animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+from { opacity: 0; transform: translateY(-8px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.ticket-item:hover { border-color: rgba(0,200,255,0.25); background: rgba(0,200,255,0.04); }
+.ticket-item.selected { border-color: var(–accent); background: rgba(0,200,255,0.06); }
+.ticket-item.priority-critical { border-left-color: var(–red); }
+.ticket-item.priority-high { border-left-color: var(–orange); }
+.ticket-item.priority-medium { border-left-color: var(–yellow); }
+.ticket-item.priority-low { border-left-color: var(–green); }
+
+.ticket-top {
+display: flex; align-items: center; gap: 8px;
+margin-bottom: 8px;
+}
+
+.ticket-id-label {
+font-family: var(–mono);
+font-size: 10px;
+color: var(–muted);
+}
+
+.priority-tag {
+font-family: var(–mono);
+font-size: 9px;
+font-weight: 600;
+letter-spacing: 0.1em;
+padding: 2px 7px;
+border-radius: 3px;
+text-transform: uppercase;
+margin-left: auto;
+}
+
+.tag-critical { background: rgba(255,59,59,0.15); color: var(–red); }
+.tag-high { background: rgba(255,140,0,0.15); color: var(–orange); }
+.tag-medium { background: rgba(255,214,0,0.12); color: var(–yellow); }
+.tag-low { background: rgba(0,232,122,0.12); color: var(–green); }
+
+.ticket-title-text {
+font-size: 13px;
+font-weight: 600;
+color: #fff;
+line-height: 1.4;
+margin-bottom: 8px;
+}
+
+.ticket-meta {
+display: flex; gap: 12px;
+font-family: var(–mono);
+font-size: 10px;
+color: var(–muted);
+}
+
+.cat-badge {
+background: rgba(0,87,255,0.12);
+color: rgba(0,200,255,0.7);
+border: 1px solid rgba(0,87,255,0.2);
+border-radius: 3px;
+padding: 1px 6px;
+font-size: 9px;
+font-family: var(–mono);
+}
+
+/* ── DETAIL PANEL ───────────────────────────────── */
+.detail-panel {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+.detail-card {
+background: var(–s1);
+border: 1px solid var(–border);
+border-radius: 14px;
+overflow: hidden;
+}
+
+.detail-body {
+padding: 16px;
+}
+
+.detail-placeholder {
+text-align: center;
+padding: 40px 20px;
+color: var(–muted);
+font-family: var(–mono);
+font-size: 12px;
+line-height: 2;
+}
+
+.field-label {
+font-family: var(–mono);
+font-size: 9px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 6px;
+margin-top: 14px;
+}
+.field-label:first-child { margin-top: 0; }
+
+.field-value {
+font-size: 13px;
+line-height: 1.6;
+color: var(–text);
+}
+
+.transcript-box {
+background: rgba(0,0,0,0.3);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 12px;
+font-family: var(–mono);
+font-size: 11px;
+line-height: 1.8;
+color: rgba(220,232,245,0.7);
+max-height: 200px;
+overflow-y: auto;
+white-space: pre-wrap;
+}
+
+.status-select {
+width: 100%;
+background: rgba(0,0,0,0.3);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 8px 12px;
+color: var(–text);
+font-family: var(–mono);
+font-size: 12px;
+outline: none;
+cursor: pointer;
+margin-top: 14px;
+}
+.status-select:focus { border-color: var(–accent); }
+
+/* ── EMPTY STATE ────────────────────────────────── */
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: var(–muted);
+}
+
+.empty-icon {
+font-size: 40px;
+margin-bottom: 12px;
+opacity: 0.4;
+}
+
+.empty-title {
+font-size: 15px;
+font-weight: 700;
+color: rgba(220,232,245,0.4);
+margin-bottom: 6px;
+}
+
+.empty-sub {
+font-family: var(–mono);
+font-size: 11px;
+line-height: 1.8;
+}
+
+/* ── RECENT CALLS ───────────────────────────────── */
+.call-item {
+padding: 10px 16px;
+border-bottom: 1px solid rgba(26,45,69,0.5);
+display: flex; align-items: center; gap: 10px;
+font-family: var(–mono);
+font-size: 11px;
+}
+
+.call-dot {
+width: 6px; height: 6px;
+border-radius: 50%;
+background: var(–green);
+flex-shrink: 0;
+}
+
+.call-number { color: var(–text); flex: 1; }
+.call-dur { color: var(–muted); }
+
+/* responsive */
+@media (max-width: 900px) {
+.stats-row { grid-template-columns: repeat(3, 1fr); }
+.main-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🎙</div>
+    <span class="brand-name">Voice<span>Desk</span> AI</span>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    LIVE
+  </div>
+  <div class="header-right">
+    <button class="demo-btn" onclick="injectDemo()">⚡ Demo-Anruf simulieren</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Stats -->
+
+  <div class="stats-row">
+    <div class="stat-card" style="--accent-color: var(--accent)">
+      <div class="stat-label">Tickets gesamt</div>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-sub">seit heute</div>
+    </div>
+    <div class="stat-card" style="--accent-color: #fff">
+      <div class="stat-label">Offen</div>
+      <div class="stat-value" id="statOpen">0</div>
+      <div class="stat-sub">unbearbeitet</div>
+    </div>
+    <div class="stat-card" style="--accent-color: var(--red)">
+      <div class="stat-label">Kritisch</div>
+      <div class="stat-value" id="statCritical">0</div>
+      <div class="stat-sub">sofort handeln</div>
+    </div>
+    <div class="stat-card" style="--accent-color: var(--orange)">
+      <div class="stat-label">Hoch</div>
+      <div class="stat-value" id="statHigh">0</div>
+      <div class="stat-sub">priorität</div>
+    </div>
+    <div class="stat-card" style="--accent-color: var(--green)">
+      <div class="stat-label">Anrufe</div>
+      <div class="stat-value" id="statCalls">0</div>
+      <div class="stat-sub">verarbeitet</div>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+
+  <div class="main-grid">
+
+```
+<!-- Ticket List -->
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Support Tickets</span>
+    <span class="count-badge" id="ticketCount">0</span>
+  </div>
+  <div class="tickets-list" id="ticketsList">
+    <div class="empty-state">
+      <div class="empty-icon">📞</div>
+      <div class="empty-title">Warte auf Anrufe…</div>
+      <div class="empty-sub">
+        Wenn jemand anruft, erscheint<br>
+        das Ticket automatisch hier.<br><br>
+        Oder klick "Demo-Anruf simulieren"
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Right Column -->
+<div class="detail-panel">
+
+  <!-- Ticket Detail -->
+  <div class="detail-card" id="detailCard">
+    <div class="panel-header">
+      <span class="panel-title">Ticket Detail</span>
+    </div>
+    <div class="detail-body">
+      <div class="detail-placeholder">
+        ← Ticket auswählen<br>um Details zu sehen
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Calls -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Letzte Anrufe</span>
+    </div>
+    <div id="callsList">
+      <div style="padding:20px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted)">
+        Noch keine Anrufe
+      </div>
+    </div>
+  </div>
+
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+let allTickets = [];
+let selectedId = null;
+
+function formatTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+function formatDuration(sec) {
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return m + ':' + String(s).padStart(2, '0') + ' min';
+}
+
+function renderTickets() {
+  const list = document.getElementById('ticketsList');
+  document.getElementById('ticketCount').textContent = allTickets.length;
+
+  if (!allTickets.length) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📞</div>
+      <div class="empty-title">Warte auf Anrufe…</div>
+      <div class="empty-sub">Wenn jemand anruft, erscheint<br>das Ticket automatisch hier.<br><br>Oder klick "Demo-Anruf simulieren"</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = allTickets.map(t => `
+    <div class="ticket-item priority-${t.priority} ${selectedId === t.id ? 'selected' : ''}"
+         onclick="selectTicket('${t.id}')">
+      <div class="ticket-top">
+        <span class="ticket-id-label">${t.id}</span>
+        <span class="cat-badge">${t.category}</span>
+        <span class="priority-tag tag-${t.priority}">${t.priority}</span>
+      </div>
+      <div class="ticket-title-text">${t.title}</div>
+      <div class="ticket-meta">
+        <span>📞 ${t.caller}</span>
+        <span>⏱ ${formatDuration(t.duration)}</span>
+        <span>${formatTime(t.createdAt)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectTicket(id) {
+  selectedId = id;
+  const t = allTickets.find(x => x.id === id);
+  if (!t) return;
+  renderTickets();
+
+  const card = document.getElementById('detailCard');
+  card.querySelector('.detail-body').innerHTML = `
+    <div class="field-label">Ticket ID</div>
+    <div class="field-value" style="font-family:var(--mono);color:var(--accent)">${t.id}</div>
+
+    <div class="field-label">Titel</div>
+    <div class="field-value" style="font-weight:700;color:#fff;font-size:14px">${t.title}</div>
+
+    <div class="field-label">Beschreibung</div>
+    <div class="field-value">${t.description}</div>
+
+    <div class="field-label">Anrufer</div>
+    <div class="field-value" style="font-family:var(--mono)">${t.caller}</div>
+
+    <div class="field-label">Gesprächsdauer</div>
+    <div class="field-value" style="font-family:var(--mono)">${formatDuration(t.duration)}</div>
+
+    <div class="field-label">Transkript</div>
+    <div class="transcript-box">${t.transcript || 'Kein Transkript verfügbar.'}</div>
+
+    <div class="field-label">Status ändern</div>
+    <select class="status-select" onchange="updateStatus('${t.id}', this.value)">
+      <option value="open" ${t.status==='open'?'selected':''}>🔴 Offen</option>
+      <option value="in-progress" ${t.status==='in-progress'?'selected':''}>🟡 In Bearbeitung</option>
+      <option value="resolved" ${t.status==='resolved'?'selected':''}>🟢 Gelöst</option>
+    </select>
+  `;
+}
+
+async function updateStatus(id, status) {
+  await fetch('/api/tickets/' + id, {
+    method: 'PATCH',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ status })
+  });
+  const t = allTickets.find(x => x.id === id);
+  if (t) t.status = status;
+  updateStats();
+}
+
+function updateStats() {
+  const open = allTickets.filter(t => t.status === 'open').length;
+  const critical = allTickets.filter(t => t.priority === 'critical').length;
+  const high = allTickets.filter(t => t.priority === 'high').length;
+  document.getElementById('statTotal').textContent = allTickets.length;
+  document.getElementById('statOpen').textContent = open;
+  document.getElementById('statCritical').textContent = critical;
+  document.getElementById('statHigh').textContent = high;
+}
+
+async function fetchStats() {
+  try {
+    const r = await fetch('/api/stats');
+    const s = await r.json();
+    document.getElementById('statCalls').textContent = s.calls;
+  } catch(e) {}
+}
+
+async function loadTickets() {
+  try {
+    const r = await fetch('/api/tickets');
+    const fresh = await r.json();
+    if (fresh.length !== allTickets.length) {
+      allTickets = fresh;
+      renderTickets();
+      updateStats();
+      fetchStats();
+    }
+  } catch(e) {}
+}
+
+async function injectDemo() {
+  const btn = document.querySelector('.demo-btn');
+  btn.textContent = '⏳ Simuliere Anruf…';
+  btn.disabled = true;
+  try {
+    await fetch('/api/demo-ticket', { method: 'POST' });
+    await loadTickets();
+  } finally {
+    btn.textContent = '⚡ Demo-Anruf simulieren';
+    btn.disabled = false;
+  }
+}
+
+// Poll every 3 seconds for new tickets
+loadTickets();
+setInterval(loadTickets, 3000);
+</script>
+
+</body>
+</html>
