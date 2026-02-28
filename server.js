@@ -9,15 +9,41 @@ let tickets = [];
 let callLog = [];
 
 function parseSummary(summary, transcript, structuredData) {
-  if (structuredData?.it_support_summary) {
-    const s = structuredData.it_support_summary;
-    return {
-      problem: s.problem || 'Problem nicht erfasst',
-      loesung: s.loesung || 'Keine Empfehlung',
-      schritte: s.schritte || 'Ticket zur weiteren Bearbeitung erstellt'
-    };
+  // Structured Output prüfen - suche nach it_support_summary egal unter welchem Key
+  if (structuredData) {
+    // Direkt als it_support_summary
+    if (structuredData.it_support_summary) {
+      const s = structuredData.it_support_summary;
+      return {
+        problem: s.problem || 'Problem nicht erfasst',
+        loesung: s.loesung || 'Keine Empfehlung',
+        schritte: s.schritte || 'Ticket zur weiteren Bearbeitung erstellt'
+      };
+    }
+    // Als UUID-Key mit name: it_support_summary
+    const keys = Object.keys(structuredData);
+    for (const key of keys) {
+      const entry = structuredData[key];
+      if (entry?.name === 'it_support_summary' && entry?.result) {
+        const s = entry.result;
+        return {
+          problem: s.problem || 'Problem nicht erfasst',
+          loesung: s.loesung || 'Keine Empfehlung',
+          schritte: s.schritte || 'Ticket zur weiteren Bearbeitung erstellt'
+        };
+      }
+      // Direkt result mit problem/loesung/schritte
+      if (entry?.problem || entry?.loesung) {
+        return {
+          problem: entry.problem || 'Problem nicht erfasst',
+          loesung: entry.loesung || 'Keine Empfehlung',
+          schritte: entry.schritte || 'Ticket zur weiteren Bearbeitung erstellt'
+        };
+      }
+    }
   }
 
+  // Fallback: Summary Text parsen
   const text = summary || transcript || '';
   const problemMatch = text.match(/PROBLEM:\s*(.+?)(?=LÖSUNG:|NÄCHSTE SCHRITTE:|$)/si);
   const loesungMatch = text.match(/LÖSUNG:\s*(.+?)(?=NÄCHSTE SCHRITTE:|PROBLEM:|$)/si);
@@ -33,6 +59,7 @@ function parseSummary(summary, transcript, structuredData) {
 app.post('/webhook', async (req, res) => {
   const event = req.body;
   console.log('VAPI Event:', event.message?.type);
+  console.log('Structured Data:', JSON.stringify(event.message?.analysis?.structuredData, null, 2));
 
   if (event.message?.type === 'end-of-call-report') {
     const call = event.message;
@@ -44,12 +71,12 @@ app.post('/webhook', async (req, res) => {
 
     const parsed = parseSummary(summary, transcript, call.analysis?.structuredData);
 
-    const lower = (transcript + ' ' + summary).toLowerCase();
+    const lower = (transcript + ' ' + summary + ' ' + parsed.problem).toLowerCase();
 
     let priority = 'medium';
     if (lower.includes('kritisch') || lower.includes('produktionsausfall') || lower.includes('dringend') || lower.includes('geht nicht mehr'))
       priority = 'critical';
-    else if (lower.includes('fehler') || lower.includes('absturz') || lower.includes('funktioniert nicht') || lower.includes('passwort') || lower.includes('anmeldung') || lower.includes('crash'))
+    else if (lower.includes('fehler') || lower.includes('absturz') || lower.includes('funktioniert nicht') || lower.includes('passwort') || lower.includes('anmeldung') || lower.includes('gesperrt') || lower.includes('crash'))
       priority = 'high';
     else if (lower.includes('frage') || lower.includes('wie') || lower.includes('info'))
       priority = 'low';
@@ -57,13 +84,13 @@ app.post('/webhook', async (req, res) => {
     let category = 'Allgemein';
     if (lower.includes('netzwerk') || lower.includes('internet') || lower.includes('verbindung') || lower.includes('vpn'))
       category = 'Netzwerk';
-    else if (lower.includes('passwort') || lower.includes('login') || lower.includes('zugang') || lower.includes('zugriff') || lower.includes('anmeldung'))
+    else if (lower.includes('passwort') || lower.includes('login') || lower.includes('zugang') || lower.includes('zugriff') || lower.includes('anmeldung') || lower.includes('gesperrt') || lower.includes('konto'))
       category = 'Zugang & Berechtigungen';
     else if (lower.includes('langsam') || lower.includes('performance') || lower.includes('lag'))
       category = 'Performance';
     else if (lower.includes('drucker') || lower.includes('hardware') || lower.includes('monitor'))
       category = 'Hardware';
-    else if (lower.includes('software') || lower.includes('programm') || lower.includes('app'))
+    else if (lower.includes('software') || lower.includes('programm') || lower.includes('app') || lower.includes('outlook'))
       category = 'Software';
 
     const title = parsed.problem.split('.')[0].substring(0, 70) || 'Support-Anfrage via Telefon';
@@ -133,7 +160,7 @@ app.post('/api/demo-ticket', (req, res) => {
       problem: 'Seit dem Windows-Update von letzter Woche dauert das Laden der Inbox mehrere Minuten. Cache-Leerung wurde bereits versucht.',
       loesung: 'Outlook-Profil neu erstellen und OST-Datei löschen. Problem tritt nach großem Update häufiger auf.',
       schritte: '1. Outlook schließen\n2. OST-Datei unter AppData löschen\n3. Outlook neu starten und synchronisieren lassen\n4. Dauer: ca. 20 Minuten',
-      category: 'Performance', priority: 'medium'
+      category: 'Software', priority: 'medium'
     }
   ];
 
