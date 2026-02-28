@@ -8,39 +8,25 @@ app.use(express.static('public'));
 let tickets = [];
 let callLog = [];
 
-// Extrahiert strukturiertes Summary aus dem VAPI Summary Text
-function parseSummary(summary, transcript) {
-  const text = summary || transcript || '';
-  
-  let problem = '';
-  let loesung = '';
-  let schritte = '';
+function parseSummary(summary, transcript, structuredData) {
+  if (structuredData?.it_support_summary) {
+    const s = structuredData.it_support_summary;
+    return {
+      problem: s.problem || 'Problem nicht erfasst',
+      loesung: s.loesung || 'Keine Empfehlung',
+      schritte: s.schritte || 'Ticket zur weiteren Bearbeitung erstellt'
+    };
+  }
 
-  // Versuche strukturiertes Format zu parsen (PROBLEM: / LÖSUNG: / NÄCHSTE SCHRITTE:)
+  const text = summary || transcript || '';
   const problemMatch = text.match(/PROBLEM:\s*(.+?)(?=LÖSUNG:|NÄCHSTE SCHRITTE:|$)/si);
   const loesungMatch = text.match(/LÖSUNG:\s*(.+?)(?=NÄCHSTE SCHRITTE:|PROBLEM:|$)/si);
   const schritteMatch = text.match(/NÄCHSTE SCHRITTE:\s*(.+?)(?=PROBLEM:|LÖSUNG:|$)/si);
 
-  if (problemMatch) problem = problemMatch[1].trim();
-  if (loesungMatch) loesung = loesungMatch[1].trim();
-  if (schritteMatch) schritte = schritteMatch[1].trim();
-
-  // Fallback: Nutze das komplette Summary wenn kein strukturiertes Format gefunden
-  if (!problem && summary) {
-    problem = summary.substring(0, 300);
-  }
-
-  // Letzter Fallback: Extrahiere aus Transkript
-  if (!problem && transcript) {
-    const lines = transcript.split('\n').filter(l => l.toLowerCase().includes('user:'));
-    problem = lines.slice(0, 3).map(l => l.replace(/user:/i, '').trim()).join(' ');
-    if (problem.length > 300) problem = problem.substring(0, 300) + '...';
-  }
-
   return {
-    problem: problem || 'Problem nicht erfasst',
-    loesung: loesung || 'Siehe Transkript',
-    schritte: schritte || 'Ticket wurde zur weiteren Bearbeitung erstellt'
+    problem: problemMatch?.[1]?.trim() || summary?.substring(0, 300) || 'Problem nicht erfasst',
+    loesung: loesungMatch?.[1]?.trim() || 'Siehe Transkript',
+    schritte: schritteMatch?.[1]?.trim() || 'Ticket zur weiteren Bearbeitung erstellt'
   };
 }
 
@@ -56,11 +42,10 @@ app.post('/webhook', async (req, res) => {
     const caller     = call.customer?.number || 'Unbekannt';
     const startedAt  = call.startedAt || new Date().toISOString();
 
-    const parsed = parseSummary(summary, transcript);
+    const parsed = parseSummary(summary, transcript, call.analysis?.structuredData);
 
     const lower = (transcript + ' ' + summary).toLowerCase();
 
-    // Priorität
     let priority = 'medium';
     if (lower.includes('kritisch') || lower.includes('produktionsausfall') || lower.includes('dringend') || lower.includes('geht nicht mehr'))
       priority = 'critical';
@@ -69,7 +54,6 @@ app.post('/webhook', async (req, res) => {
     else if (lower.includes('frage') || lower.includes('wie') || lower.includes('info'))
       priority = 'low';
 
-    // Kategorie
     let category = 'Allgemein';
     if (lower.includes('netzwerk') || lower.includes('internet') || lower.includes('verbindung') || lower.includes('vpn'))
       category = 'Netzwerk';
@@ -82,7 +66,6 @@ app.post('/webhook', async (req, res) => {
     else if (lower.includes('software') || lower.includes('programm') || lower.includes('app'))
       category = 'Software';
 
-    // Titel aus Problem ableiten
     const title = parsed.problem.split('.')[0].substring(0, 70) || 'Support-Anfrage via Telefon';
 
     const ticket = {
